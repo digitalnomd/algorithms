@@ -20,6 +20,24 @@ def shortestDistance(grid):
 
     return select(distances)
 
+def shortestDistanceWalk(grid):
+
+    onePoints = findPointsWalk(grid)
+
+    for point in onePoints:
+        bfsWalk(grid, point)
+
+    shortestDistance = sys.maxsize
+    for i in range(len(grid)):
+        for j in range(len(grid[0])):
+            if grid[i][j] < 0 and shortestDistance > (grid[i][j] * -1):
+                shortestDistance = (grid[i][j] * -1)
+
+    if shortestDistance == sys.maxsize:
+        return -1
+    else:
+        return shortestDistance
+
 def findPoints(grid):
     buildings = 0
     zeroPoints = []
@@ -30,6 +48,14 @@ def findPoints(grid):
             elif grid[i][j] == 1:
                 buildings += 1
     return (buildings, zeroPoints)
+
+def findPointsWalk(grid):
+    onePoints = []
+    for i in range(len(grid)):
+        for j in range(len(grid[0])):
+            if grid[i][j] == 1:
+                onePoints += [[i,j]]
+    return onePoints
 
 def bfs(grid, root, targets):
     hits, sumDist = 0, 0
@@ -72,6 +98,39 @@ def bfs(grid, root, targets):
 
     return sumDist
 
+def bfsWalk(grid, root):
+    q = []
+    q.append((root, 0))
+    found = False
+    visited = set()
+    while(len(q) > 0):
+        tup = q.pop(0)
+        curr = tup[0]
+        dist = tup[1]
+
+        if grid[curr[0]][curr[1]] <= 0:
+            grid[curr[0]][curr[1]] += dist
+
+        if (curr[0] - 1) >= 0 and grid[curr[0] -1][curr[1]] <= 0  and (curr[0] - 1, curr[1]) not in visited:
+            q.append(([curr[0] - 1, curr[1]], dist - 1))
+            visited.add((curr[0] - 1, curr[1]))
+        if (curr[0] + 1) < len(grid) and grid[curr[0] + 1][curr[1]] <= 0 and (curr[0] + 1, curr[1]) not in visited:
+            q.append(([curr[0] + 1, curr[1]], dist - 1))
+            visited.add((curr[0] + 1, curr[1]))
+        if (curr[1] - 1) >= 0 and grid[curr[0]][curr[1] - 1] <= 0 and (curr[0], curr[1] - 1) not in visited:
+            q.append(([curr[0], curr[1] - 1], dist - 1))
+            visited.add((curr[0], curr[1] - 1))
+        if (curr[1] + 1) < len(grid[0]) and grid[curr[0]][curr[1] + 1] <= 0 and (curr[0], curr[1] + 1) not in visited:
+            q.append(([curr[0], curr[1] + 1], dist - 1))
+            visited.add((curr[0], curr[1] + 1))
+
+    for i in range(len(grid)):
+        for j in range(len(grid[0])):
+            if (i, j) not in visited:
+                grid[i][j] = 3
+
+    return
+
 def select(distances):
     min = sys.maxsize
     for dist in distances:
@@ -84,8 +143,10 @@ def select(distances):
         return min
 
 def main():
-    grid = [[1,0,2,0,1],[0,0,0,0,0],[0,0,1,0,0]]
-    print(shortestDistance(grid))
+    #grid = [[0,1],[1,0]]
+    #grid = [[1,0,2,0,1],[0,0,0,0,0],[0,0,1,0,0]]
+    #print(shortestDistance(grid))
+    #print(shortestDistanceWalk(grid))
     grid = [[0,2,0,0,2,2,2,2,2,2,2,0,0,0,0,2,2,1,0,0,2,0,2,0,2,0,0,2,2,2,0,0,2,0,2,0,2,2,2,0,2],
             [0,0,0,0,0,2,2,0,2,0,0,0,0,0,2,0,0,2,2,0,2,2,2,2,0,0,2,2,0,0,2,2,1,0,0,2,2,0,2,0,0],
             [0,0,0,0,2,2,0,0,0,0,0,0,2,2,0,2,2,0,0,0,2,2,2,2,0,0,0,0,2,2,0,0,0,0,0,2,0,0,2,2,0],
@@ -107,6 +168,7 @@ def main():
             [2,0,0,1,1,0,1,0,2,0,0,2,1,0,2,0,0,2,2,0,2,0,2,2,0,1,2,0,2,0,0,0,0,0,0,2,0,0,2,0,0],
             [2,2,0,0,0,2,2,0,2,2,0,0,0,2,0,0,0,2,0,0,2,0,0,2,0,0,0,2,0,0,0,2,2,2,0,2,0,0,2,0,2]]
     print(shortestDistance(grid))
+    #print(shortestDistanceWalk(grid))
 
 
 if __name__ == '__main__':
